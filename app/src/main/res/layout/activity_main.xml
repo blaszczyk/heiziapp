@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="heizi.heizi.MainActivity">
+
+    <heizi.heizi.HeiziTextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="27pt"
+        android:layout_marginTop="48pt"
+        android:text="Heizi"
+        android:textAlignment="center"
+        android:textColor="#FF0000"
+        android:textSize="24pt" />
+
+    <GridLayout
+        android:id="@+id/dataGrid"
+        android:layout_below="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20pt"
+        android:layout_marginStart="40pt"
+        android:columnCount="2"
+        android:layout_centerInParent="true"
+        android:rowCount="4">
+
+        <heizi.heizi.HeiziTextView
+            android:id="@+id/labelTag"
+            android:text="TAG"
+            android:textAlignment="textStart"
+            android:textSize="24pt"
+            android:textColor="#FF0000"
+            android:layout_width="60pt"
+            android:layout_height="27pt" />
+        <heizi.heizi.HeiziTextView
+            android:id="@+id/valueTag"
+            android:textAlignment="textEnd"
+            android:textSize="24pt"
+            android:textColor="#FF0000"
+            android:layout_width="80pt"
+            android:layout_height="27pt" />
+        <heizi.heizi.HeiziTextView
+            android:id="@+id/labelTy"
+            android:text="TY"
+            android:textAlignment="textStart"
+            android:textSize="24pt"
+            android:textColor="#FF0000"
+            android:layout_width="60pt"
+            android:layout_height="27pt" />
+        <heizi.heizi.HeiziTextView
+            android:id="@+id/valueTy"
+            android:textAlignment="textEnd"
+            android:textSize="24pt"
+            android:textColor="#FF0000"
+            android:layout_width="80pt"
+            android:layout_height="27pt" />
+        <heizi.heizi.HeiziTextView
+            android:id="@+id/labelPo"
+            android:text="PO"
+            android:textAlignment="textStart"
+            android:textSize="24pt"
+            android:textColor="#FF0000"
+            android:layout_width="60pt"
+            android:layout_height="27pt" />
+        <heizi.heizi.HeiziTextView
+            android:id="@+id/valuePo"
+            android:textAlignment="textEnd"
+            android:textSize="24pt"
+            android:textColor="#FF0000"
+            android:layout_width="80pt"
+            android:layout_height="27pt" />
+        <heizi.heizi.HeiziTextView
+            android:id="@+id/labelPu"
+            android:text="PU"
+            android:textAlignment="textStart"
+            android:textSize="24pt"
+            android:textColor="#FF0000"
+            android:layout_width="60pt"
+            android:layout_height="27pt" />
+        <heizi.heizi.HeiziTextView
+            android:id="@+id/valuePu"
+            android:textAlignment="textEnd"
+            android:textSize="24pt"
+            android:textColor="#FF0000"
+            android:layout_width="80pt"
+            android:layout_height="27pt" />
+    </GridLayout>
+    <heizi.heizi.HeiziTextView
+        android:id="@+id/dataAge"
+        android:textAlignment="center"
+        android:textSize="20pt"
+        android:textColor="#FF0000"
+        android:layout_marginTop="16pt"
+        android:layout_below="@id/dataGrid"
+        android:layout_width="match_parent"
+        android:layout_height="27pt" />
+    <heizi.heizi.HeiziTextView
+        android:id="@+id/message"
+        android:textAlignment="center"
+        android:textSize="10pt"
+        android:textColor="#FF0000"
+        android:layout_below="@id/dataAge"
+        android:layout_marginTop="27pt"
+        android:layout_width="match_parent"
+        android:layout_height="20pt" />
+
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="50pt"
+        android:layout_margin="5pt"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true">
+        <ImageButton
+            android:id="@+id/locateButton"
+            android:src="@drawable/ic_dish"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:layout_margin="5pt"
+            android:layout_width="26pt"
+            android:layout_height="26pt" />
+        <ImageButton
+            android:id="@+id/refreshButton"
+            android:src="@drawable/ic_refresh"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:layout_margin="5pt"
+            android:layout_width="26pt"
+            android:layout_height="26pt" />
+    </GridLayout>
+</RelativeLayout>
