@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean refreshPending = false;
     private boolean serviceFound = false;
+    private int requestFails = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +111,9 @@ public class MainActivity extends AppCompatActivity {
         if(!serviceFound) {
             return;
         }
-        txtMessage.setText("aktualisiere");
+        final Animation rotation = AnimationUtils.loadAnimation(this.getApplicationContext(), R.anim.rotate);
+        rotation.setRepeatCount(Animation.INFINITE);
+        btnRefresh.startAnimation(rotation);
         final boolean requestRequired = !refreshPending;
         client.request().latest().enqueue(new Callback<DataSet>() {
             @Override
@@ -122,26 +127,36 @@ public class MainActivity extends AppCompatActivity {
                 txtAge.setText(new SimpleDateFormat("HH:mm:ss").format(time));
                 txtMessage.setText("");
                 btnLocate.setVisibility(View.INVISIBLE);
+                rotation.setRepeatCount(0);
+                requestFails = 0;
 
                 if(requestRequired) {
                     refreshPending = true;
-                    final Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            refreshPending = false;
-                            fetchLatestData();
-                        }
-                    }, 5000);
+                    delayRequest();
                 }
             }
 
             @Override
             public void onFailure(Call<DataSet> call, Throwable t) {
                 Log.e("ERROR", "fetching data failed", t);
-                txtMessage.setText("Service nicht erreichbar");
+                txtMessage.setText("Server nicht erreichbar");
                 btnLocate.setVisibility(View.VISIBLE);
+                rotation.setRepeatCount(0);
+                if( requestFails++ < 5) {
+                    delayRequest();
+                }
             }
         });
     };
+
+    private void delayRequest() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                refreshPending = false;
+                fetchLatestData();
+            }
+        }, 5000);
+    }
 }
