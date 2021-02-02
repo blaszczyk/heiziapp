@@ -1,29 +1,30 @@
 package heizi.heizi;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import heizi.heizi.data.DataSet;
+import heizi.heizi.data.HeiziClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String HOST_KEY = "service.host";
+    static final String HOST_KEY = "service.host";
 
     private HeiziClient client;
 
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageButton btnRefresh;
     private ImageButton btnLocate;
+    private ImageButton btnGraph;
 
     private boolean refreshPending = false;
     private boolean serviceFound = false;
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         txtMessage = (TextView) findViewById(R.id.message);
         btnRefresh = (ImageButton) findViewById(R.id.refreshButton);
         btnLocate = (ImageButton) findViewById(R.id.locateButton);
+        btnGraph = (ImageButton) findViewById(R.id.graphButton);
 
         btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,8 +75,19 @@ public class MainActivity extends AppCompatActivity {
                 locateService();
             }
         });
+        btnGraph.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Intent intent = new Intent(MainActivity.this, GraphActivity.class);
+                intent.putExtra(HOST_KEY, preferences().getString(HOST_KEY, null));
+                startActivity(intent);
+            }
+        });
         if(serviceFound) {
             btnLocate.setVisibility(View.INVISIBLE);
+        }
+        else {
+            btnGraph.setVisibility(View.INVISIBLE);
         }
         fetchLatestData();
     }
@@ -82,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         serviceFound = false;
         btnRefresh.setVisibility(View.INVISIBLE);
         btnLocate.setVisibility(View.INVISIBLE);
+        btnGraph.setVisibility(View.INVISIBLE);
         client.locateService("192.168.2.", new HeiziClient.HostNameConsumer() {
             @Override
             public void consume(String host) {
@@ -127,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
                 txtAge.setText(new SimpleDateFormat("HH:mm:ss").format(time));
                 txtMessage.setText("");
                 btnLocate.setVisibility(View.INVISIBLE);
+                btnGraph.setVisibility(View.VISIBLE);
                 rotation.setRepeatCount(0);
                 requestFails = 0;
 
@@ -141,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("ERROR", "fetching data failed", t);
                 txtMessage.setText("Server nicht erreichbar");
                 btnLocate.setVisibility(View.VISIBLE);
+                btnGraph.setVisibility(View.INVISIBLE);
                 rotation.setRepeatCount(0);
                 if( requestFails++ < 5) {
                     delayRequest();

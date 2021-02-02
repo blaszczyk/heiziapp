@@ -131,5 +131,14 @@
             android:layout_margin="5pt"
             android:layout_width="26pt"
             android:layout_height="26pt" />
+        <ImageButton
+            android:id="@+id/graphButton"
+            android:src="@drawable/ic_graph"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:layout_margin="5pt"
+            android:layout_width="26pt"
+            android:layout_height="26pt" />
     </GridLayout>
 </RelativeLayout>

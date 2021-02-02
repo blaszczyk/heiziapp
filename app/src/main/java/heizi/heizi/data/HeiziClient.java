@@ -1,6 +1,4 @@
-package heizi.heizi;
-
-import android.preference.PreferenceManager;
+package heizi.heizi.data;
 
 import java.util.concurrent.TimeUnit;
 

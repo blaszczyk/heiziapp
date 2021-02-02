@@ -1,8 +1,4 @@
-package heizi.heizi;
-
-/**
- * Created by Michael on 1/25/2021.
- */
+package heizi.heizi.data;
 
 public class DataSet {
 
