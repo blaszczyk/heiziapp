@@ -14,12 +14,12 @@ import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.PointsGraphSeries;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import heizi.heizi.data.DataRange;
 import heizi.heizi.data.HeiziClient;
@@ -53,7 +53,6 @@ public class GraphActivity extends AppCompatActivity {
         gridLabelRenderer.setGridColor(Color.WHITE);
         gridLabelRenderer.setHorizontalLabelsColor(Color.WHITE);
         gridLabelRenderer.setVerticalLabelsColor(Color.WHITE);
-//        gridLabelRenderer.setGridStyle();
 
         rangeButtons = (LinearLayout) findViewById(R.id.rangeButtons);
         addButton(3, true);
@@ -105,6 +104,7 @@ public class GraphActivity extends AppCompatActivity {
     }
 
     private void requestRange(final long hours) {
+        graphView.removeAllSeries();
         final long maxTime = System.currentTimeMillis();
         final long minTime = maxTime - hours * 3_600_000L;
         client.request().range(minTime / 1000, maxTime / 1000).enqueue(new Callback<DataRange>() {
@@ -112,12 +112,12 @@ public class GraphActivity extends AppCompatActivity {
             public void onResponse(Call<DataRange> call, Response<DataRange> response) {
                 final DataRange data = response.body();
 
-                graphView.removeAllSeries();
+                addCornerPoints(minTime, maxTime);
+                addTurData(data.getTur());
                 addData(data.getTy(), "TY", Color.GRAY);
                 addData(data.getTag(), "TAG", Color.RED);
                 addData(data.getPo(), "PO", Color.YELLOW);
                 addData(data.getPu(), "PU", Color.CYAN);
-                addData(data.getTur(), "Tür", Color.GREEN);
 
                 viewPort.setXAxisBoundsManual(true);
                 viewPort.setMinX(minTime);
@@ -128,9 +128,7 @@ public class GraphActivity extends AppCompatActivity {
                 viewPort.setMaxY(300);
 
                 viewPort.setScalable(true);
-//                viewPort.setScrollable(true);
                 viewPort.setScalableY(true);
-//                viewPort.setScrollableY(true);
             }
 
             @Override
@@ -138,6 +136,41 @@ public class GraphActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void addTurData(int[] data) {
+        List<DataPoint> turData = new ArrayList<>();
+        int lastdatum = 0;
+        for(final int datum : data) {
+            if(lastdatum > 0 && datum - lastdatum > 60) {
+                addTurSeries(turData);
+                turData = new ArrayList<>();
+            }
+            turData.add(new DataPoint(datum * 1000L, 300));
+            lastdatum = datum;
+        }
+        addTurSeries(turData);
+    }
+
+    private void addTurSeries(List<DataPoint> data) {
+        if(data.isEmpty()) {
+            return;
+        }
+        final LineGraphSeries series = new LineGraphSeries(data.toArray(new DataPoint[data.size()]));
+        series.setBackgroundColor(Color.argb(127, 0,127,0));
+        series.setColor(Color.GREEN);
+        series.setDrawBackground(true);
+        graphView.addSeries(series);
+    }
+
+    private void addCornerPoints(long minTime, long maxTime) {
+        final DataPoint[] corners = new DataPoint[]{
+                new DataPoint(minTime, 0),
+                new DataPoint(maxTime, 300)
+        };
+        final PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(corners);
+        series.setColor(Color.TRANSPARENT);
+        graphView.addSeries(series);
     }
 
     private void addData(int[][] data, String title, int color) {
@@ -149,7 +182,7 @@ public class GraphActivity extends AppCompatActivity {
         for(final int[] datum : data) {
             if( lastDatum != null
                     && (datum[0] - lastDatum[0] > 60
-                    || Math.abs(datum[1] - lastDatum[1]) > 20 )) {
+                    || Math.abs(datum[1] - lastDatum[1]) > 15 )) {
                 addSeries(dataList, title, color);
                 dataList = new ArrayList<>();
             }

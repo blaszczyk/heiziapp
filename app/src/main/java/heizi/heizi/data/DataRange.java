@@ -10,7 +10,7 @@ public class DataRange {
 
     private int[][] pu;
 
-    private int[][] tur;
+    private int[] tur;
 
     public int[][] getTag() {
         return tag;
@@ -28,7 +28,7 @@ public class DataRange {
         return pu;
     }
 
-    public int[][] getTur() {
+    public int[] getTur() {
         return tur;
     }
 
@@ -48,7 +48,7 @@ public class DataRange {
         this.pu = pu;
     }
 
-    public void setTime(int[][] time) {
+    public void setTur(int[] tur) {
         this.tur = tur;
     }
 }
