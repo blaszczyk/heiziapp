@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
@@ -36,6 +37,7 @@ public class GraphActivity extends AppCompatActivity {
 
     private LinearLayout rangeButtons;
     private Button selectedButton;
+    private ProgressBar spinner;
 
     private Typeface typeface;
 
@@ -60,6 +62,8 @@ public class GraphActivity extends AppCompatActivity {
         addButton(24, false);
         addButton(72, false);
 
+        spinner = (ProgressBar) findViewById(R.id.spinner);
+
         final String hostName = getIntent().getStringExtra(MainActivity.HOST_KEY);
         client = new HeiziClient(hostName);
         requestRange(3);
@@ -72,7 +76,7 @@ public class GraphActivity extends AppCompatActivity {
         button.setBackground(null);
         button.setWidth(20);
         button.setHeight(20);
-        button.setTextSize(20);
+        button.setTextSize(18);
         if(select) {
             select(button);
         }
@@ -107,10 +111,12 @@ public class GraphActivity extends AppCompatActivity {
         graphView.removeAllSeries();
         final long maxTime = System.currentTimeMillis();
         final long minTime = maxTime - hours * 3_600_000L;
+        spinner.setVisibility(View.VISIBLE);
         client.request().range(minTime / 1000, maxTime / 1000).enqueue(new Callback<DataRange>() {
             @Override
             public void onResponse(Call<DataRange> call, Response<DataRange> response) {
                 final DataRange data = response.body();
+                spinner.setVisibility(View.INVISIBLE);
 
                 addCornerPoints(minTime, maxTime);
                 addTurData(data.getTur());
@@ -133,7 +139,7 @@ public class GraphActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<DataRange> call, Throwable t) {
-
+                spinner.setVisibility(View.INVISIBLE);
             }
         });
     }

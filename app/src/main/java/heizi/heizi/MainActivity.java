@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -95,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
     private void locateService() {
         serviceFound = false;
         btnRefresh.setVisibility(View.INVISIBLE);
-        btnLocate.setVisibility(View.INVISIBLE);
         btnGraph.setVisibility(View.INVISIBLE);
         client.locateService("192.168.2.", new HeiziClient.HostNameConsumer() {
             @Override
@@ -126,9 +126,12 @@ public class MainActivity extends AppCompatActivity {
         if(!serviceFound) {
             return;
         }
-        final Animation rotation = AnimationUtils.loadAnimation(this.getApplicationContext(), R.anim.rotate);
+        final Animation rotation = new RotateAnimation(0,360, Animation.RELATIVE_TO_SELF, 0.5F, Animation.RELATIVE_TO_SELF, 0.5F);
+        rotation.setRepeatMode(Animation.RESTART);
         rotation.setRepeatCount(Animation.INFINITE);
+        rotation.setDuration(1000);
         btnRefresh.startAnimation(rotation);
+
         final boolean requestRequired = !refreshPending;
         client.request().latest().enqueue(new Callback<DataSet>() {
             @Override
