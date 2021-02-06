@@ -8,7 +8,7 @@ public class BootBroadcastReveiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        AlertReceiver.scheduleAlert(context, 0, 0);
+        AlertReceiver.scheduleAlert(context);
     }
 
 }

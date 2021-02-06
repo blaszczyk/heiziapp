@@ -8,21 +8,26 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import heizi.heizi.data.HeiziDataEvaluator;
 import heizi.heizi.HeiziPreferences;
 import heizi.heizi.data.DataSet;
 import heizi.heizi.data.HeiziClient;
+import heizi.heizi.data.HeiziDataEvaluator;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AlertReceiver extends BroadcastReceiver {
 
+
     private static PendingIntent lastIntent = null;
 
     private static String SERVER_FAILS = "server.fails";
 
-    public static void scheduleAlert(final Context context, int waitTimeSeconds, int serverFails) {
+    public static void scheduleAlert(final Context context) {
+        scheduleAlert(context, 300, 0);
+    }
+
+    private static void scheduleAlert(final Context context, int waitTimeSeconds, int serverFails) {
         final AlarmManager alarmManager = context.getSystemService(AlarmManager.class);
         if(lastIntent != null) {
             alarmManager.cancel(lastIntent);
@@ -34,9 +39,15 @@ public class AlertReceiver extends BroadcastReceiver {
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextAlert, lastIntent);
     }
 
+
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        final HeiziClient client = new HeiziClient(new HeiziPreferences(context).getServiceHost());
+        final String serviceHost = new HeiziPreferences(context).getServiceHost();
+        if(serviceHost == null) {
+            scheduleAlert(context);
+            return;
+        }
+        final HeiziClient client = new HeiziClient(serviceHost);
         client.request().latest().enqueue(new Callback<DataSet>() {
             @Override
             public void onResponse(Call<DataSet> call, Response<DataSet> response) {
@@ -49,10 +60,10 @@ public class AlertReceiver extends BroadcastReceiver {
                             .setContentTitle(message.getTitle())
                             .build();
                     notificationManager.notify(0, notification1);
-                    scheduleAlert(context, 300, 0);
+                    scheduleAlert(context);
                 }
                 else {
-                    scheduleAlert(context, 120, 0);
+                    scheduleAlert(context);
                 }
             }
 
@@ -64,5 +75,4 @@ public class AlertReceiver extends BroadcastReceiver {
             }
         });
     }
-
 }

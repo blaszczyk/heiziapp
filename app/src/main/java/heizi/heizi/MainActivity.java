@@ -24,6 +24,8 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final long REFRESH_INTERVAL = 5000L;
+
     private HeiziClient client;
     private HeiziPreferences preferences;
 
@@ -39,9 +41,23 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton btnLocate;
     private ImageButton btnGraph;
 
-    private boolean refreshPending = false;
+    private long lastRefresh = 0;
+    private boolean isRunning = true;
     private boolean serviceFound = false;
     private int requestFails = 0;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isRunning = true;
+        fetchLatestData();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isRunning = false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             btnGraph.setVisibility(View.INVISIBLE);
         }
         fetchLatestData();
-        AlertReceiver.scheduleAlert(this, 300, 0);
+        AlertReceiver.scheduleAlert(this);
     }
 
     private void locateService() {
@@ -118,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchLatestData() {
+        lastRefresh = System.currentTimeMillis();
         if(!serviceFound) {
             return;
         }
@@ -127,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
         rotation.setDuration(1000);
         btnRefresh.startAnimation(rotation);
 
-        final boolean requestRequired = !refreshPending;
         client.request().latest().enqueue(new Callback<DataSet>() {
             @Override
             public void onResponse(Call<DataSet> call, Response<DataSet> response) {
@@ -145,10 +161,7 @@ public class MainActivity extends AppCompatActivity {
                 rotation.setRepeatCount(0);
                 requestFails = 0;
 
-                if(requestRequired) {
-                    refreshPending = true;
-                    delayRequest();
-                }
+                delayRequest();
             }
 
             @Override
@@ -169,9 +182,10 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                refreshPending = false;
-                fetchLatestData();
+                if(isRunning && System.currentTimeMillis() - lastRefresh >= REFRESH_INTERVAL) {
+                    fetchLatestData();
+                }
             }
-        }, 5000);
+        }, REFRESH_INTERVAL);
     }
 }
