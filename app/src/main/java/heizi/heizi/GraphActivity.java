@@ -64,7 +64,7 @@ public class GraphActivity extends AppCompatActivity {
 
         spinner = (ProgressBar) findViewById(R.id.spinner);
 
-        final String hostName = getIntent().getStringExtra(MainActivity.HOST_KEY);
+        final String hostName = new HeiziPreferences(this).getServiceHost();
         client = new HeiziClient(hostName);
         requestRange(3);
     }
@@ -186,6 +186,9 @@ public class GraphActivity extends AppCompatActivity {
         List<DataPoint> dataList = new ArrayList<>();
         int[] lastDatum = null;
         for(final int[] datum : data) {
+            if(datum[1] > 300) {
+                continue;
+            }
             if( lastDatum != null
                     && (datum[0] - lastDatum[0] > 60
                     || Math.abs(datum[1] - lastDatum[1]) > 15 )) {

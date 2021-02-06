@@ -1,15 +1,12 @@
 package heizi.heizi;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -19,15 +16,16 @@ import java.util.Date;
 
 import heizi.heizi.data.DataSet;
 import heizi.heizi.data.HeiziClient;
+import heizi.heizi.data.HeiziDataEvaluator;
+import heizi.heizi.notification.AlertReceiver;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    static final String HOST_KEY = "service.host";
-
     private HeiziClient client;
+    private HeiziPreferences preferences;
 
     private TextView txtTag;
     private TextView txtTy;
@@ -49,9 +47,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.i("--INFO","activity started");
+        Log.i("main","activity started");
 
-        final String serviceHost = preferences().getString(HOST_KEY, null);
+        preferences = new HeiziPreferences(this);
+        final String serviceHost = preferences.getServiceHost();
         serviceFound = serviceHost != null;
         client = new HeiziClient(serviceHost);
         txtTag = (TextView) findViewById(R.id.valueTag);
@@ -80,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 final Intent intent = new Intent(MainActivity.this, GraphActivity.class);
-                intent.putExtra(HOST_KEY, preferences().getString(HOST_KEY, null));
                 startActivity(intent);
             }
         });
@@ -91,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
             btnGraph.setVisibility(View.INVISIBLE);
         }
         fetchLatestData();
+        AlertReceiver.scheduleAlert(this, 300, 0);
     }
 
     private void locateService() {
@@ -100,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         client.locateService("192.168.2.", new HeiziClient.HostNameConsumer() {
             @Override
             public void consume(String host) {
-                preferences().edit().putString(HOST_KEY, host).apply();
+                preferences.setServiceHost(host);
                 client = new HeiziClient(host);
                 serviceFound = true;
                 fetchLatestData();
@@ -116,10 +115,6 @@ public class MainActivity extends AppCompatActivity {
                 txtMessage.setText(message);
             }
         });
-    }
-
-    private SharedPreferences preferences() {
-        return PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     private void fetchLatestData() {
@@ -143,7 +138,8 @@ public class MainActivity extends AppCompatActivity {
                 txtPu.setText(data.getPu() + " °C");
                 final Date time = new Date(data.getTime() * 1000L);
                 txtAge.setText(new SimpleDateFormat("HH:mm:ss").format(time));
-                txtMessage.setText("");
+                final HeiziDataEvaluator.Message message = HeiziDataEvaluator.getMessage(data);
+                txtMessage.setText(message != null ? message.getTitle() : "");
                 btnLocate.setVisibility(View.INVISIBLE);
                 btnGraph.setVisibility(View.VISIBLE);
                 rotation.setRepeatCount(0);
@@ -157,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<DataSet> call, Throwable t) {
-                Log.e("ERROR", "fetching data failed", t);
                 txtMessage.setText("Server nicht erreichbar");
                 btnLocate.setVisibility(View.VISIBLE);
                 btnGraph.setVisibility(View.INVISIBLE);
