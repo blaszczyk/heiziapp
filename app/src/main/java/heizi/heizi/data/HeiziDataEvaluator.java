@@ -1,21 +1,22 @@
 package heizi.heizi.data;
 
-import heizi.heizi.data.DataSet;
-
 public class HeiziDataEvaluator {
 
     public static Message getMessage(final DataSet data) {
-        if(data.getPo() <= 60) {
-            return new Message("Buffer wird kalt", "Temperatur " + data.getPo() + "°C");
+        final long currentTimeSec = System.currentTimeMillis() / 1000L;
+        final long turAge = currentTimeSec - data.getTur();
+        if(data.getPo() < 60 && data.getTag() < 150 && turAge > 300) {
+            final String tempus = data.getPo() < 45 ? "ist" : "wird";
+            return new Message("Speicher " + tempus + " kalt", "Temperatur " + data.getPo() + "°C");
         }
         if(data.getPu() > 80) {
-            return new Message("Buffer zu heiss", "Temperatur " + data.getPu() + "°C");
+            return new Message("Speicher zu heiss", "Temperatur " + data.getPu() + "°C");
         }
         if(data.getTag() > 300) {
             return new Message("Ofen zu heiss", "Temperatur " + data.getTag() + "°C");
         }
-        final long dataAge = System.currentTimeMillis() / 1000L - data.getTime();
-        if(dataAge > 300L) {
+        final long dataAge = currentTimeSec - data.getTime();
+        if(dataAge > 300L && turAge > 300L) {
             return new Message("Keine neuen Daten", "seit " + dataAge + " sec.");
         }
         return null;

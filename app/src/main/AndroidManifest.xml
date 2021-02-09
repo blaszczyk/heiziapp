@@ -24,8 +24,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".GraphActivity"/>
-        <receiver android:name=".notification.AlertReceiver" />
-        <receiver android:name=".notification.BootBroadcastReveiver">
+        <receiver android:name=".notification.AlertReceiver"
+            android:process=":remote"/>
+        <receiver android:name=".notification.BootBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />

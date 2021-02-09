@@ -12,15 +12,9 @@ public class DataSet {
 
     private int time;
 
-    public DataSet() { }
+    private int tur;
 
-    public DataSet(int tag, int ty, int po, int pu, int time) {
-        this.tag = tag;
-        this.ty = ty;
-        this.po = po;
-        this.pu = pu;
-        this.time = time;
-    }
+    public DataSet() { }
 
     public int getTag() {
         return tag;
@@ -42,6 +36,10 @@ public class DataSet {
         return time;
     }
 
+    public int getTur() {
+        return tur;
+    }
+
     public void setTag(int tag) {
         this.tag = tag;
     }
@@ -60,5 +58,9 @@ public class DataSet {
 
     public void setTime(int time) {
         this.time = time;
+    }
+
+    public void setTur(int tur) {
+        this.tur = tur;
     }
 }

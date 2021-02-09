@@ -18,6 +18,7 @@ import heizi.heizi.data.DataSet;
 import heizi.heizi.data.HeiziClient;
 import heizi.heizi.data.HeiziDataEvaluator;
 import heizi.heizi.notification.AlertReceiver;
+import heizi.heizi.notification.HeiziNotification;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,14 +29,6 @@ public class MainActivity extends AppCompatActivity {
 
     private HeiziClient client;
     private HeiziPreferences preferences;
-
-    private TextView txtTag;
-    private TextView txtTy;
-    private TextView txtPo;
-    private TextView txtPu;
-
-    private TextView txtAge;
-    private TextView txtMessage;
 
     private ImageButton btnRefresh;
     private ImageButton btnLocate;
@@ -51,12 +44,20 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         isRunning = true;
         fetchLatestData();
+        new HeiziNotification(this).cancelAll();
+        AlertReceiver.scheduleAlert(this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         isRunning = false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AlertReceiver.scheduleAlert(this);
     }
 
     @Override
@@ -69,12 +70,6 @@ public class MainActivity extends AppCompatActivity {
         final String serviceHost = preferences.getServiceHost();
         serviceFound = serviceHost != null;
         client = new HeiziClient(serviceHost);
-        txtTag = (TextView) findViewById(R.id.valueTag);
-        txtTy = (TextView) findViewById(R.id.valueTy);
-        txtPo = (TextView) findViewById(R.id.valuePo);
-        txtPu = (TextView) findViewById(R.id.valuePu);
-        txtAge = (TextView) findViewById(R.id.dataAge);
-        txtMessage = (TextView) findViewById(R.id.message);
         btnRefresh = (ImageButton) findViewById(R.id.refreshButton);
         btnLocate = (ImageButton) findViewById(R.id.locateButton);
         btnGraph = (ImageButton) findViewById(R.id.graphButton);
@@ -104,8 +99,14 @@ public class MainActivity extends AppCompatActivity {
         else {
             btnGraph.setVisibility(View.INVISIBLE);
         }
-        fetchLatestData();
-        AlertReceiver.scheduleAlert(this);
+    }
+
+    private void setText(int id, String text) {
+        ((TextView) findViewById(id)).setText(text);
+    }
+
+    private void setMessage(String message) {
+        setText(R.id.message, message);
     }
 
     private void locateService() {
@@ -123,12 +124,12 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public void fail() {
-                txtMessage.setText("Server nicht gefunden");
+                setMessage("Server nicht gefunden");
                 btnLocate.setVisibility(View.VISIBLE);
             }
             @Override
             public void message(String message) {
-                txtMessage.setText(message);
+                setMessage(message);
             }
         });
     }
@@ -148,14 +149,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<DataSet> call, Response<DataSet> response) {
                 final DataSet data = response.body();
-                txtTag.setText(data.getTag() + " °C");
-                txtTy.setText(data.getTy() + " °C");
-                txtPo.setText(data.getPo() + " °C");
-                txtPu.setText(data.getPu() + " °C");
+                setText(R.id.valueTag, data.getTag() + " °C");
+                setText(R.id.valueTy, data.getTy() + " °C");
+                setText(R.id.valuePo, data.getPo() + " °C");
+                setText(R.id.valuePu, data.getPu() + " °C");
                 final Date time = new Date(data.getTime() * 1000L);
-                txtAge.setText(new SimpleDateFormat("HH:mm:ss").format(time));
+                setText(R.id.dataAge, new SimpleDateFormat("HH:mm:ss").format(time));
                 final HeiziDataEvaluator.Message message = HeiziDataEvaluator.getMessage(data);
-                txtMessage.setText(message != null ? message.getTitle() : "");
+                setMessage(message != null ? message.getTitle() : "");
                 btnLocate.setVisibility(View.INVISIBLE);
                 btnGraph.setVisibility(View.VISIBLE);
                 rotation.setRepeatCount(0);
@@ -166,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<DataSet> call, Throwable t) {
-                txtMessage.setText("Server nicht erreichbar");
+                setMessage("Server nicht erreichbar");
                 btnLocate.setVisibility(View.VISIBLE);
                 btnGraph.setVisibility(View.INVISIBLE);
                 rotation.setRepeatCount(0);
@@ -188,4 +189,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }, REFRESH_INTERVAL);
     }
+
+
 }

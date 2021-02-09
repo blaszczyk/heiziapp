@@ -1,8 +1,5 @@
 package heizi.heizi.data;
 
-import java.util.Map;
-
-import heizi.heizi.data.DataSet;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
