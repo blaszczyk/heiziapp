@@ -149,10 +149,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<DataSet> call, Response<DataSet> response) {
                 final DataSet data = response.body();
-                setText(R.id.valueTag, data.getTag() + " °C");
-                setText(R.id.valueTy, data.getTy() + " °C");
-                setText(R.id.valuePo, data.getPo() + " °C");
-                setText(R.id.valuePu, data.getPu() + " °C");
+                setValue(R.id.rowTag, data.getTag(), data.getDtag());
+                setValue(R.id.rowTy, data.getTy(), data.getDty());
+                setValue(R.id.rowPo, data.getPo(), data.getDpo());
+                setValue(R.id.rowPu, data.getPu(), data.getDpu());
+
                 final Date time = new Date(data.getTime() * 1000L);
                 setText(R.id.dataAge, new SimpleDateFormat("HH:mm:ss").format(time));
                 final HeiziDataEvaluator.Message message = HeiziDataEvaluator.getMessage(data);
@@ -178,6 +179,10 @@ public class MainActivity extends AppCompatActivity {
         });
     };
 
+    private void setValue(int id, int value, double slope) {
+        ((DataRowView) findViewById(id)).setData(value, slope);
+    }
+
     private void delayRequest() {
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -189,6 +194,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }, REFRESH_INTERVAL);
     }
-
 
 }

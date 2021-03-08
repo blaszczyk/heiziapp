@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+    <heizi.heizi.HeiziTextView
+        android:id="@+id/label"
+        android:layout_width="40pt"
+        android:layout_height="27pt"
+        android:textAlignment="textStart"
+        android:textColor="#FF0000"
+        android:textSize="24pt" />
+    <heizi.heizi.HeiziTextView
+        android:id="@+id/value"
+        android:layout_width="60pt"
+        android:layout_height="27pt"
+        android:textAlignment="textEnd"
+        android:textColor="#FF0000"
+        android:textSize="24pt" />
+    <ImageView
+        android:id="@+id/slope"
+        android:layout_width="20pt"
+        android:layout_height="20pt"
+        android:layout_marginTop="7pt"
+        android:layout_marginLeft="7pt"
+        android:visibility="invisible"
+        android:src="@drawable/ic_rarrow" />
+</merge>
