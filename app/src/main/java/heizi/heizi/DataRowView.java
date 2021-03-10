@@ -23,7 +23,7 @@ public class DataRowView extends GridLayout {
     public void setData(int value, double slope) {
         setText(R.id.value,value + "°C");
         final ImageView slopeView = (ImageView) findViewById(R.id.slope);
-        final float angle = (float) Math.atan(slope * 180) * -57.3f;
+        final float angle = (float) Math.atan(slope) * -57.3f;
         slopeView.setRotation(angle);
         slopeView.setVisibility(View.VISIBLE);
     }
