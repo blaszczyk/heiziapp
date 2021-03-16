@@ -11,7 +11,6 @@ import java.util.Random;
 import heizi.heizi.HeiziPreferences;
 import heizi.heizi.data.DataSet;
 import heizi.heizi.data.HeiziClient;
-import heizi.heizi.data.HeiziDataEvaluator;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -48,9 +47,9 @@ public class AlertReceiver extends BroadcastReceiver {
         client.request().latest().enqueue(new Callback<DataSet>() {
             @Override
             public void onResponse(Call<DataSet> call, Response<DataSet> response) {
-                final HeiziDataEvaluator.Message message = HeiziDataEvaluator.getMessage(response.body());
-                if(message != null) {
-                    new HeiziNotification(context).notify(message.getTitle(), message.getText());
+                final DataSet.Message message = response.body().getMessage();
+                if(message != null && message.getLevel().equals(DataSet.Message.Level.ALERT)) {
+                    new HeiziNotification(context).notify(message.getTitle(), message.getDetail());
                 }
                 scheduleAlert(context);
             }

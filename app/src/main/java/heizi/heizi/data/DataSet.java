@@ -22,6 +22,8 @@ public class DataSet {
 
     private int tur;
 
+    private Message message;
+
     public DataSet() { }
 
     public int getTag() {
@@ -64,6 +66,10 @@ public class DataSet {
         return tur;
     }
 
+    public Message getMessage() {
+        return message;
+    }
+
     public void setTag(int tag) {
         this.tag = tag;
     }
@@ -102,5 +108,46 @@ public class DataSet {
 
     public void setTur(int tur) {
         this.tur = tur;
+    }
+
+    public void setMessage(Message message) {
+        this.message = message;
+    }
+
+    public static class Message {
+
+        public enum Level {
+            ALERT, INFO, ADMIN;
+        }
+
+        private Level level;
+
+        private String title;
+
+        private String detail;
+
+        public Level getLevel() {
+            return level;
+        }
+
+        public void setLevel(Level level) {
+            this.level = level;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getDetail() {
+            return detail;
+        }
+
+        public void setDetail(String detail) {
+            this.detail = detail;
+        }
     }
 }

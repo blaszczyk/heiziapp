@@ -16,7 +16,6 @@ import java.util.Date;
 
 import heizi.heizi.data.DataSet;
 import heizi.heizi.data.HeiziClient;
-import heizi.heizi.data.HeiziDataEvaluator;
 import heizi.heizi.notification.AlertReceiver;
 import heizi.heizi.notification.HeiziNotification;
 import retrofit2.Call;
@@ -156,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
 
                 final Date time = new Date(data.getTime() * 1000L);
                 setText(R.id.dataAge, new SimpleDateFormat("HH:mm:ss").format(time));
-                final HeiziDataEvaluator.Message message = HeiziDataEvaluator.getMessage(data);
+                final DataSet.Message message = data.getMessage();
                 setMessage(message != null ? message.getTitle() : "");
                 btnLocate.setVisibility(View.INVISIBLE);
                 btnGraph.setVisibility(View.VISIBLE);
