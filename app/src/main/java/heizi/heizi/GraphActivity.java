@@ -189,7 +189,7 @@ public class GraphActivity extends AppCompatActivity {
                 continue;
             }
             if( lastDatum != null
-                    && (datum[0] - lastDatum[0] > 60
+                    && (datum[0] - lastDatum[0] > 300
                     || Math.abs(datum[1] - lastDatum[1]) > 15 )) {
                 addSeries(dataList, title, color);
                 dataList = new ArrayList<>();
