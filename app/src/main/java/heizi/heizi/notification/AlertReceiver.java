@@ -22,7 +22,7 @@ public class AlertReceiver extends BroadcastReceiver {
     private static final Random random = new Random();
 
     public static void scheduleAlert(final Context context) {
-        scheduleAlert(context, 300, 0);
+//        scheduleAlert(context, 300, 0);
     }
 
     private static void scheduleAlert(final Context context, int waitTimeSeconds, int serverFails) {
