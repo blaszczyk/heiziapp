@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "25.0.0"
     defaultConfig {
         applicationId "heizi.heizi"
         minSdkVersion 23
-        targetSdkVersion 29
-        versionCode 3
-        versionName "0.0.3"
+        targetSdkVersion 30
+        versionCode 4
+        versionName "0.3.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
