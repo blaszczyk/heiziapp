@@ -64,8 +64,7 @@ public class GraphActivity extends AppCompatActivity {
 
         spinner = (ProgressBar) findViewById(R.id.spinner);
 
-        final String hostName = new HeiziPreferences(this).getServiceHost();
-        client = new HeiziClient(hostName);
+        client = new HeiziClient();
         requestRange(3);
     }
 

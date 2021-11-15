@@ -38,12 +38,7 @@ public class AlertReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        final String serviceHost = new HeiziPreferences(context).getServiceHost();
-        if(serviceHost == null) {
-            scheduleAlert(context);
-            return;
-        }
-        final HeiziClient client = new HeiziClient(serviceHost);
+        final HeiziClient client = new HeiziClient();
         client.request().latest().enqueue(new Callback<DataSet>() {
             @Override
             public void onResponse(Call<DataSet> call, Response<DataSet> response) {

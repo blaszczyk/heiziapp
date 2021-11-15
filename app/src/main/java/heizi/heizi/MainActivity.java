@@ -30,12 +30,10 @@ public class MainActivity extends AppCompatActivity {
     private HeiziPreferences preferences;
 
     private ImageButton btnRefresh;
-    private ImageButton btnLocate;
     private ImageButton btnGraph;
 
     private long lastRefresh = 0;
     private boolean isRunning = true;
-    private boolean serviceFound = false;
     private int requestFails = 0;
 
     @Override
@@ -66,23 +64,14 @@ public class MainActivity extends AppCompatActivity {
         Log.i("main","activity started");
 
         preferences = new HeiziPreferences(this);
-        final String serviceHost = preferences.getServiceHost();
-        serviceFound = serviceHost != null;
-        client = new HeiziClient(serviceHost);
+        client = new HeiziClient();
         btnRefresh = (ImageButton) findViewById(R.id.refreshButton);
-        btnLocate = (ImageButton) findViewById(R.id.locateButton);
         btnGraph = (ImageButton) findViewById(R.id.graphButton);
 
         btnRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 fetchLatestData();
-            }
-        });
-        btnLocate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                locateService();
             }
         });
         btnGraph.setOnClickListener(new View.OnClickListener() {
@@ -92,12 +81,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        if(serviceFound) {
-            btnLocate.setVisibility(View.INVISIBLE);
-        }
-        else {
-            btnGraph.setVisibility(View.INVISIBLE);
-        }
     }
 
     private void setText(int id, String text) {
@@ -108,36 +91,8 @@ public class MainActivity extends AppCompatActivity {
         setText(R.id.message, message);
     }
 
-    private void locateService() {
-        serviceFound = false;
-        btnRefresh.setVisibility(View.INVISIBLE);
-        btnGraph.setVisibility(View.INVISIBLE);
-        client.locateService("192.168.2.", new HeiziClient.HostNameConsumer() {
-            @Override
-            public void consume(String host) {
-                preferences.setServiceHost(host);
-                client = new HeiziClient(host);
-                serviceFound = true;
-                fetchLatestData();
-                btnRefresh.setVisibility(View.VISIBLE);
-            }
-            @Override
-            public void fail() {
-                setMessage("Server nicht gefunden");
-                btnLocate.setVisibility(View.VISIBLE);
-            }
-            @Override
-            public void message(String message) {
-                setMessage(message);
-            }
-        });
-    }
-
     private void fetchLatestData() {
         lastRefresh = System.currentTimeMillis();
-        if(!serviceFound) {
-            return;
-        }
         final Animation rotation = new RotateAnimation(0,360, Animation.RELATIVE_TO_SELF, 0.5F, Animation.RELATIVE_TO_SELF, 0.5F);
         rotation.setRepeatMode(Animation.RESTART);
         rotation.setRepeatCount(Animation.INFINITE);
@@ -157,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
                 setText(R.id.dataAge, new SimpleDateFormat("HH:mm:ss").format(time));
                 final DataSet.Message message = data.getMessage();
                 setMessage(message != null ? message.getTitle() : "");
-                btnLocate.setVisibility(View.INVISIBLE);
                 btnGraph.setVisibility(View.VISIBLE);
                 rotation.setRepeatCount(0);
                 requestFails = 0;
@@ -168,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<DataSet> call, Throwable t) {
                 setMessage("Server nicht erreichbar");
-                btnLocate.setVisibility(View.VISIBLE);
                 btnGraph.setVisibility(View.INVISIBLE);
                 rotation.setRepeatCount(0);
                 if( requestFails++ < 5) {

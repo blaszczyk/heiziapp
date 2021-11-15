@@ -86,16 +86,6 @@
         app:layout_constraintVertical_bias="1.0">
 
         <ImageButton
-            android:id="@+id/locateButton"
-            android:layout_width="26pt"
-            android:layout_height="26pt"
-            android:layout_margin="5pt"
-            android:adjustViewBounds="true"
-            android:background="@null"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_dish" />
-
-        <ImageButton
             android:id="@+id/refreshButton"
             android:layout_width="26pt"
             android:layout_height="26pt"

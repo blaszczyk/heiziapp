@@ -14,14 +14,6 @@ public class HeiziPreferences {
         this.context  = context;
     }
 
-    public String getServiceHost() {
-        return shared().getString(HOST_KEY, null);
-    }
-
-    public void setServiceHost(final String host) {
-        shared().edit().putString(HOST_KEY, host).apply();
-    }
-
     // TODO use androidx bit fix dupe dependency
     private SharedPreferences shared() {
         return PreferenceManager.getDefaultSharedPreferences(context);
