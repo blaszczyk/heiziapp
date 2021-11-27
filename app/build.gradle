@@ -7,8 +7,8 @@ android {
         applicationId "heizi.heizi"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 4
-        versionName "0.3.0"
+        versionCode 5
+        versionName "0.3.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
