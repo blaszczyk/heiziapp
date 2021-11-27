@@ -10,6 +10,8 @@ public class DataRange {
 
     private int[][] pu;
 
+    private int[][] owm;
+
     private int[] tur;
 
     public int[][] getTag() {
@@ -26,6 +28,10 @@ public class DataRange {
 
     public int[][] getPu() {
         return pu;
+    }
+
+    public int[][] getOwm() {
+        return owm;
     }
 
     public int[] getTur() {
@@ -46,6 +52,10 @@ public class DataRange {
 
     public void setPu(int[][] pu) {
         this.pu = pu;
+    }
+
+    public void setOwm(int[][] owm) {
+        this.owm = owm;
     }
 
     public void setTur(int[] tur) {

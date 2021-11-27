@@ -46,6 +46,9 @@
         <heizi.heizi.DataRowView
             android:id="@+id/rowPu"
             custom:label="PU"/>
+        <heizi.heizi.DataRowView
+            android:id="@+id/rowOwm"
+            custom:label="OWM"/>
     </GridLayout>
 
     <heizi.heizi.HeiziTextView

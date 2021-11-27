@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 setValue(R.id.rowTy, data.getTy(), data.getDty());
                 setValue(R.id.rowPo, data.getPo(), data.getDpo());
                 setValue(R.id.rowPu, data.getPu(), data.getDpu());
+                setValue(R.id.rowOwm, data.getOwm(), null);
 
                 final Date time = new Date(data.getTime() * 1000L);
                 setText(R.id.dataAge, new SimpleDateFormat("HH:mm:ss").format(time));
@@ -131,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         });
     };
 
-    private void setValue(int id, int value, double slope) {
+    private void setValue(int id, int value, Double slope) {
         ((DataRowView) findViewById(id)).setData(value, slope);
     }
 

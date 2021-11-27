@@ -20,12 +20,14 @@ public class DataRowView extends GridLayout {
         setText(R.id.label, label);
     }
 
-    public void setData(int value, double slope) {
+    public void setData(int value, Double slope) {
         setText(R.id.value,value + "°C");
         final ImageView slopeView = (ImageView) findViewById(R.id.slope);
-        final float angle = (float) Math.atan(slope) * -57.3f;
-        slopeView.setRotation(angle);
-        slopeView.setVisibility(View.VISIBLE);
+        if (slope != null) {
+            final float angle = (float) Math.atan(slope) * -57.3f;
+            slopeView.setRotation(angle);
+            slopeView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setText(int id, String text) {

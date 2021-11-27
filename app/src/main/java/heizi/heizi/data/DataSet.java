@@ -22,6 +22,8 @@ public class DataSet {
 
     private int tur;
 
+    private int owm;
+
     private Message message;
 
     public DataSet() { }
@@ -66,6 +68,10 @@ public class DataSet {
         return tur;
     }
 
+    public int getOwm() {
+        return owm;
+    }
+
     public Message getMessage() {
         return message;
     }
@@ -108,6 +114,10 @@ public class DataSet {
 
     public void setTur(int tur) {
         this.tur = tur;
+    }
+
+    public void setOwm(int owm) {
+        this.owm = owm;
     }
 
     public void setMessage(Message message) {

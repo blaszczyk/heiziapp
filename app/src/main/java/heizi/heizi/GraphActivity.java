@@ -117,20 +117,26 @@ public class GraphActivity extends AppCompatActivity {
                 final DataRange data = response.body();
                 spinner.setVisibility(View.INVISIBLE);
 
-                addCornerPoints(minTime, maxTime);
+                final int minOwm = getMinTemp(data.getOwm());
+
+                final int maxTemp = 300;
+                final int minTemp = Math.min(0, minOwm - 10);
+
+                addCornerPoints(minTime, minTemp, maxTime, maxTemp);
                 addTurData(data.getTur());
-                addData(data.getTy(), "TY", Color.GRAY);
-                addData(data.getTag(), "TAG", Color.RED);
-                addData(data.getPo(), "PO", Color.YELLOW);
-                addData(data.getPu(), "PU", Color.CYAN);
+                addData(data.getTy(), "TY", Color.GRAY, 300);
+                addData(data.getTag(), "TAG", Color.RED, 300);
+                addData(data.getPo(), "PO", Color.YELLOW, 300);
+                addData(data.getPu(), "PU", Color.CYAN, 300);
+                addData(data.getOwm(), "OWM", Color.LTGRAY, 1800);
 
                 viewPort.setXAxisBoundsManual(true);
                 viewPort.setMinX(minTime);
                 viewPort.setMaxX(maxTime);
 
                 viewPort.setYAxisBoundsManual(true);
-                viewPort.setMinY(0);
-                viewPort.setMaxY(300);
+                viewPort.setMinY(minTemp);
+                viewPort.setMaxY(maxTemp);
 
                 viewPort.setScalable(true);
                 viewPort.setScalableY(true);
@@ -168,17 +174,17 @@ public class GraphActivity extends AppCompatActivity {
         graphView.addSeries(series);
     }
 
-    private void addCornerPoints(long minTime, long maxTime) {
+    private void addCornerPoints(long minTime, int minTemp, long maxTime, int maxTemp) {
         final DataPoint[] corners = new DataPoint[]{
-                new DataPoint(minTime, 0),
-                new DataPoint(maxTime, 300)
+                new DataPoint(minTime, minTemp),
+                new DataPoint(maxTime, maxTemp)
         };
         final PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(corners);
         series.setColor(Color.TRANSPARENT);
         graphView.addSeries(series);
     }
 
-    private void addData(int[][] data, String title, int color) {
+    private void addData(int[][] data, String title, int color, int gapThreshold) {
         if(data == null) {
             return;
         }
@@ -189,7 +195,7 @@ public class GraphActivity extends AppCompatActivity {
                 continue;
             }
             if( lastDatum != null
-                    && (datum[0] - lastDatum[0] > 300
+                    && (datum[0] - lastDatum[0] > gapThreshold
                     || Math.abs(datum[1] - lastDatum[1]) > 15 )) {
                 addSeries(dataList, title, color);
                 dataList = new ArrayList<>();
@@ -209,5 +215,16 @@ public class GraphActivity extends AppCompatActivity {
             series.setTitle(title);
             graphView.addSeries(series);
         }
+    }
+
+    private static int getMinTemp(int[][] data) {
+        int result = Integer.MAX_VALUE;
+        for (int[] datum : data) {
+            final int temp = datum[1];
+            if (temp < result) {
+                result = temp;
+            }
+        }
+        return result;
     }
 }

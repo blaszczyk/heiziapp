@@ -2,7 +2,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android" >
     <heizi.heizi.HeiziTextView
         android:id="@+id/label"
-        android:layout_width="40pt"
+        android:layout_width="50pt"
         android:layout_height="27pt"
         android:textAlignment="textStart"
         android:textColor="#FF0000"
