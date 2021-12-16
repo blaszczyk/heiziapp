@@ -36,6 +36,10 @@ public class GraphActivity extends AppCompatActivity {
     private static final int COLOR_PU = Color.CYAN;
     private static final int COLOR_OWM = Color.rgb(127, 0, 255);
 
+    private static final int COLOR_VENT_ON = Color.argb(127, 0,127,0);
+    private static final int COLOR_VENT_OFF = Color.argb(127, 127, 63, 0);
+    private static final int COLOR_VENT_TOP = Color.GREEN;
+
     private GraphView graphView;
     private Viewport viewPort;
 
@@ -155,27 +159,30 @@ public class GraphActivity extends AppCompatActivity {
         });
     }
 
-    private void addTurData(int[] data) {
+    private void addTurData(int[][] data) {
         List<DataPoint> turData = new ArrayList<>();
-        int lastdatum = 0;
-        for(final int datum : data) {
-            if(lastdatum > 0 && datum - lastdatum > 60) {
-                addTurSeries(turData);
+        int[] lastdatum = {0,0};
+        for(final int[] datum : data) {
+            if(lastdatum[0] > 0 &&
+                    (datum[0] - lastdatum[0] > 60
+                    || datum[1] != lastdatum[1])) {
+                addTurSeries(turData, lastdatum[1]);
                 turData = new ArrayList<>();
             }
-            turData.add(new DataPoint(datum * 1000L, 300));
+            turData.add(new DataPoint(datum[0] * 1000L, 300));
             lastdatum = datum;
         }
-        addTurSeries(turData);
+        addTurSeries(turData, lastdatum[1]);
     }
 
-    private void addTurSeries(List<DataPoint> data) {
+    private void addTurSeries(List<DataPoint> data, int vent) {
         if(data.isEmpty()) {
             return;
         }
+        final int backgroundColor = vent > 0 ? COLOR_VENT_ON : COLOR_VENT_OFF;
         final LineGraphSeries series = new LineGraphSeries(data.toArray(new DataPoint[data.size()]));
-        series.setBackgroundColor(Color.argb(127, 0,127,0));
-        series.setColor(Color.GREEN);
+        series.setBackgroundColor(backgroundColor);
+        series.setColor(COLOR_VENT_TOP);
         series.setDrawBackground(true);
         graphView.addSeries(series);
     }

@@ -12,7 +12,7 @@ public class DataRange {
 
     private int[][] owm;
 
-    private int[] tur;
+    private int[][] tur;
 
     public int[][] getTag() {
         return tag;
@@ -34,7 +34,7 @@ public class DataRange {
         return owm;
     }
 
-    public int[] getTur() {
+    public int[][] getTur() {
         return tur;
     }
 
@@ -58,7 +58,7 @@ public class DataRange {
         this.owm = owm;
     }
 
-    public void setTur(int[] tur) {
+    public void setTur(int[][] tur) {
         this.tur = tur;
     }
 }
