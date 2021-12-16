@@ -30,6 +30,12 @@ import retrofit2.Response;
 
 public class GraphActivity extends AppCompatActivity {
 
+    private static final int COLOR_TAG = Color.RED;
+    private static final int COLOR_TY = Color.GRAY;
+    private static final int COLOR_PO = Color.YELLOW;
+    private static final int COLOR_PU = Color.CYAN;
+    private static final int COLOR_OWM = Color.rgb(127, 0, 255);
+
     private GraphView graphView;
     private Viewport viewPort;
 
@@ -124,11 +130,11 @@ public class GraphActivity extends AppCompatActivity {
 
                 addCornerPoints(minTime, minTemp, maxTime, maxTemp);
                 addTurData(data.getTur());
-                addData(data.getTy(), "TY", Color.GRAY, 300);
-                addData(data.getTag(), "TAG", Color.RED, 300);
-                addData(data.getPo(), "PO", Color.YELLOW, 300);
-                addData(data.getPu(), "PU", Color.CYAN, 300);
-                addData(data.getOwm(), "OWM", Color.LTGRAY, 1800);
+                addData(data.getTy(), "TY", COLOR_TY, 300);
+                addData(data.getTag(), "TAG", COLOR_TAG, 300);
+                addData(data.getPo(), "PO", COLOR_PO, 300);
+                addData(data.getPu(), "PU", COLOR_PU, 300);
+                addData(data.getOwm(), "OWM", COLOR_OWM, 1800);
 
                 viewPort.setXAxisBoundsManual(true);
                 viewPort.setMinX(minTime);
