@@ -209,7 +209,7 @@ public class GraphActivity extends AppCompatActivity {
             }
             if( lastDatum != null
                     && (datum[0] - lastDatum[0] > gapThreshold
-                    || Math.abs(datum[1] - lastDatum[1]) > 15 )) {
+                    || Math.abs(datum[1] - lastDatum[1]) > 30 )) {
                 addSeries(dataList, title, color);
                 dataList = new ArrayList<>();
             }
