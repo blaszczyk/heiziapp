@@ -3,9 +3,13 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">#555555</item>
+        <item name="colorPrimary">#BBBBBB</item>
         <item name="colorPrimaryDark">#222222</item>
-        <item name="colorAccent">#888888</item>
+        <item name="colorAccent">#FF8888</item>
+        <item name="colorButtonNormal">#FF6600</item>
+        <item name="android:textColorPrimary">#FF0000</item>
+        <item name="android:textColorSecondary">#FF0066</item>
+        <item name="textColorAlertDialogListItem">#FF0000</item>
         <item name="android:background">#222222</item>
     </style>
 
