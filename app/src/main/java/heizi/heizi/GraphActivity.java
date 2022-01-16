@@ -1,13 +1,24 @@
 package heizi.heizi;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TimePicker;
+
+import androidx.fragment.app.DialogFragment;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.GridLabelRenderer;
@@ -19,11 +30,13 @@ import com.jjoe64.graphview.series.PointsGraphSeries;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import heizi.heizi.data.DataRange;
 import heizi.heizi.data.HeiziClient;
+import heizi.heizi.notification.AlertReceiver;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -40,16 +53,27 @@ public class GraphActivity extends AppCompatActivity {
     private static final int COLOR_VENT_OFF = Color.argb(127, 127, 63, 0);
     private static final int COLOR_VENT_TOP = Color.GREEN;
 
+    private static final String[] RANGE_VALUES = new String[]{"3", "10", "24", "72"};
+    private static final long REFRESH_INTERVAL = 10_000L;
+
     private GraphView graphView;
     private Viewport viewPort;
 
     private HeiziClient client;
 
-    private LinearLayout rangeButtons;
-    private Button selectedButton;
+    private Button dateButton;
+    private Button timeButton;
+    private Button rangeButton;
+    private Button liveButton;
+
     private ProgressBar spinner;
 
     private Typeface typeface;
+
+    private int selectedRange = 3;
+    private Calendar selectedTime = Calendar.getInstance();
+    private boolean live = true;
+    private boolean canceled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,66 +90,123 @@ public class GraphActivity extends AppCompatActivity {
         gridLabelRenderer.setHorizontalLabelsColor(Color.WHITE);
         gridLabelRenderer.setVerticalLabelsColor(Color.WHITE);
 
-        rangeButtons = (LinearLayout) findViewById(R.id.rangeButtons);
-        addButton(3, true);
-        addButton(10, false);
-        addButton(24, false);
-        addButton(72, false);
-
+        dateButton = addButton(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DatePickerFragment fragment = new DatePickerFragment();
+                fragment.graphActivity = GraphActivity.this;
+                fragment.show(getSupportFragmentManager(), "datePicker");
+                setLive(false);
+            }
+        });
+        timeButton = addButton(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                TimePickerFragment fragment = new TimePickerFragment();
+                fragment.graphActivity = GraphActivity.this;
+                fragment.show(getSupportFragmentManager(), "timePicker");
+                setLive(false);
+            }
+        });
+        rangeButton = addButton(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                RangePickerFragment fragment = new RangePickerFragment();
+                fragment.graphActivity = GraphActivity.this;
+                fragment.show(getSupportFragmentManager(), "rangePicker");
+                setLive(false);
+            }
+        });
+        liveButton = addButton(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setLive(!live);
+            }
+        });
+        setButtonText();
+        liveButton.setText("LIVE");
         spinner = (ProgressBar) findViewById(R.id.spinner);
 
         client = new HeiziClient();
-        requestRange(3);
+        setLive(true);
     }
 
-    private void addButton(final long hours, final boolean select) {
+    @Override
+    protected void onPause() {
+        super.onPause();
+        canceled = true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        canceled = false;
+        if (live) {
+            requestLiveData();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        canceled = true;
+    }
+
+    private Button addButton(final View.OnClickListener listener) {
         final Button button = new Button(getApplicationContext());
-        button.setText(hours + " h");
         button.setTextColor(Color.RED);
         button.setBackground(null);
-        button.setWidth(20);
         button.setHeight(20);
         button.setTextSize(18);
-        if(select) {
-            select(button);
+        button.setTypeface(typeface, Typeface.BOLD);
+        button.setOnClickListener(listener);
+        ((LinearLayout) findViewById(R.id.buttons)).addView(button);
+        return button;
+    }
+
+    private void setButtonText() {
+        rangeButton.setText("- " + selectedRange + "h");
+        dateButton.setText(new SimpleDateFormat("yy-MM-dd").format(selectedTime.getTime()));
+        timeButton.setText(new SimpleDateFormat("HH:mm").format(selectedTime.getTime()));
+    }
+
+    private void setLive(final boolean live) {
+        this.live = live;
+        if (live) {
+            liveButton.setBackgroundColor(Color.rgb(43,0,95));
+            requestLiveData();
         }
         else {
-            unselect(button);
+            liveButton.setBackground(null);
         }
-        button.setOnClickListener(new View.OnClickListener() {
+    }
+
+    private void requestLiveData() {
+        selectedTime = Calendar.getInstance();
+        selectedRange = 3;
+        requestRange();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
             @Override
-            public void onClick(View view) {
-                select(button);
-                requestRange(hours);
+            public void run() {
+                if(live && !canceled) {
+                    requestLiveData();
+                }
             }
-        });
-        rangeButtons.addView(button);
+        }, REFRESH_INTERVAL);
     }
 
-    private void select(final Button button) {
-        if(selectedButton != null) {
-            unselect(selectedButton);
-        }
-        button.setTypeface(typeface, Typeface.BOLD);
-        button.setBackgroundColor(Color.rgb(43,0,95));
-        selectedButton = button;
-    }
-
-    private void unselect(final Button button) {
-        button.setTypeface(typeface, Typeface.NORMAL);
-        button.setBackground(null);
-    }
-
-    private void requestRange(final long hours) {
-        graphView.removeAllSeries();
-        final long maxTime = System.currentTimeMillis();
-        final long minTime = maxTime - hours * 3_600_000L;
+    private void requestRange() {
+        setButtonText();
+        final long maxTime = selectedTime.getTimeInMillis();
+        final long minTime = getMinTime();
         spinner.setVisibility(View.VISIBLE);
         client.request().range(minTime / 1000, maxTime / 1000).enqueue(new Callback<DataRange>() {
             @Override
             public void onResponse(Call<DataRange> call, Response<DataRange> response) {
                 final DataRange data = response.body();
                 spinner.setVisibility(View.INVISIBLE);
+                graphView.removeAllSeries();
 
                 final int minOwm = getMinTemp(data.getOwm());
 
@@ -157,6 +238,10 @@ public class GraphActivity extends AppCompatActivity {
                 spinner.setVisibility(View.INVISIBLE);
             }
         });
+    }
+
+    private long getMinTime() {
+        return selectedTime.getTimeInMillis() - selectedRange * 3_600_000L;
     }
 
     private void addTurData(int[][] data) {
@@ -240,4 +325,70 @@ public class GraphActivity extends AppCompatActivity {
         }
         return result;
     }
+
+    public static class DatePickerFragment extends AbstractGraphFragment implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            int year = get(Calendar.YEAR);
+            int month = get(Calendar.MONTH);
+            int day = get(Calendar.DAY_OF_MONTH);
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        @Override
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            set(Calendar.YEAR, year);
+            set(Calendar.MONTH, month);
+            set(Calendar.DAY_OF_MONTH, day);
+            graphActivity.requestRange();
+        }
+    }
+
+    public static class TimePickerFragment extends AbstractGraphFragment implements TimePickerDialog.OnTimeSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            int hourOfDay = get(Calendar.HOUR_OF_DAY);
+            int minute = get(Calendar.MINUTE);
+            return new TimePickerDialog(getActivity(), this, hourOfDay, minute, true);
+        }
+
+        @Override
+        public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
+            set(Calendar.HOUR_OF_DAY, hourOfDay);
+            set(Calendar.MINUTE, minute);
+            graphActivity.requestRange();
+        }
+    }
+
+    public static class RangePickerFragment extends AbstractGraphFragment implements DialogInterface.OnClickListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Zeitraum / Stunden")
+                    .setItems(RANGE_VALUES, this);
+            return builder.create();
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            graphActivity.selectedRange = Integer.parseInt(RANGE_VALUES[which]);
+            graphActivity.requestRange();
+        }
+    }
+
+    private static abstract class AbstractGraphFragment extends DialogFragment {
+        GraphActivity graphActivity;
+
+        int get(int field) {
+            return graphActivity.selectedTime.get(field);
+        }
+
+        void set(int field, int value) {
+            graphActivity.selectedTime.set(field, value);
+        }
+    }
+
 }
