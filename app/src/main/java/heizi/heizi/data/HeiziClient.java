@@ -3,30 +3,25 @@ package heizi.heizi.data;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HeiziClient {
 
     private final HeiziRequest request;
-    private final static String SERVICE_HOST = "heizi.fritz.box";
-
-    private final static String PROTOCOL = "http://";
-    private final static String PORT = ":4321";
+    private final static String SERVICE_URL = "http://heizi.fritz.box:4321";
+    private final static long TIMEOUT_MILLIS = 3000L;
 
     public HeiziClient() {
-        this.request = createRequest(SERVICE_HOST, 3000);
+        this.request = createRequest();
     }
 
-    private static HeiziRequest createRequest(final String host, final int connectionTimeout) {
+    private static HeiziRequest createRequest() {
         OkHttpClient httpClient = new OkHttpClient.Builder()
-                .connectTimeout(connectionTimeout, TimeUnit.MILLISECONDS)
+                .connectTimeout(TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
                 .build();
         return new Retrofit.Builder()
-                .baseUrl(PROTOCOL + host + PORT)
+                .baseUrl(SERVICE_URL)
                 .client(httpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build().create(HeiziRequest.class);
